@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taboche Restaurant Handover</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <img src="assets/logo.png" alt="Taboche Logo" class="logo">
+    <h1>Taboche Handover</h1>
+  </header>
+
+  <main>
+    <!-- Compact Grid Layout -->
+    <section class="grid">
+      <div class="card">
+        <h2>Staff</h2>
+        <input type="text" id="staffName" placeholder="Name">
+        <select id="shift">
+          <option>Morning</option>
+          <option>Evening</option>
+          <option>Full Day</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <h2>Float</h2>
+        <select id="startingFloat">
+          <option value="5000">₹5000</option>
+          <option value="3000">₹3000</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <h2>Cash</h2>
+        <div class="denom"><label>₹1000</label><input type="number" id="d1000" value="0"></div>
+        <div class="denom"><label>₹500</label><input type="number" id="d500" value="0"></div>
+        <div class="denom"><label>₹100</label><input type="number" id="d100" value="0"></div>
+        <div class="denom"><label>₹50</label><input type="number" id="d50" value="0"></div>
+        <div class="denom"><label>₹20</label><input type="number" id="d20" value="0"></div>
+        <div class="denom"><label>₹10</label><input type="number" id="d10" value="0"></div>
+        <div class="denom"><label>₹5</label><input type="number" id="d5" value="0"></div>
+      </div>
+
+      <div class="card">
+        <h2>Digital</h2>
+        <input type="number" id="digital" value="0">
+      </div>
+
+      <div class="card">
+        <h2>Notes</h2>
+        <textarea id="notes" rows="3" placeholder="Remarks..."></textarea>
+      </div>
+
+      <div class="card summary">
+        <h2>Summary</h2>
+        <p id="cashTotal">Cash: ₹0</p>
+        <p id="grandTotal">Grand: ₹0</p>
+        <p id="netHandover">Net: ₹0</p>
+        <button id="shareBtn">📋 Share Slip</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Taboche Restaurant</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
