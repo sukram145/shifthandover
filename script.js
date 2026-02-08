@@ -1,112 +1,122 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Set date
-    const dateEl = document.getElementById('currentDate');
+
     const now = new Date();
-    dateEl.textContent = now.toLocaleDateString('en-IN', { 
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+    const formattedDate = now.toLocaleString('en-IN', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
     });
 
-    const inputs = document.querySelectorAll('input, select, textarea');
+    document.getElementById('currentDate').textContent = formattedDate;
+
+    const inputs = document.querySelectorAll('input[id], select[id], textarea[id]');
     const denomInputs = document.querySelectorAll('.denom-input');
 
-    // Load saved data
-    loadFormData();
+    loadData();
+    calculateTotals();
 
-    // Event Listeners
-    inputs.forEach(input => {
-        input.addEventListener('input', () => {
+    inputs.forEach(el => {
+        el.addEventListener('input', () => {
+            sanitize();
             calculateTotals();
-            saveFormData();
+            saveData();
         });
     });
 
-    document.getElementById('copyBtn').addEventListener('click', () => shareSlip('copy'));
-    document.getElementById('whatsappBtn').addEventListener('click', () => shareSlip('whatsapp'));
-    document.getElementById('resetBtn').addEventListener('click', resetForm);
+    document.getElementById('copyBtn').onclick = () => share('copy');
+    document.getElementById('whatsappBtn').onclick = () => share('whatsapp');
+    document.getElementById('resetBtn').onclick = resetForm;
+
+    function sanitize() {
+        document.querySelectorAll('input[type="number"]').forEach(i => {
+            if (i.value < 0) i.value = 0;
+        });
+    }
 
     function calculateTotals() {
-        let cashTotal = 0;
+        let cash = 0;
 
-        // Calculate Denominations
-        denomInputs.forEach(input => {
-            const val = parseInt(input.getAttribute('data-val'));
-            const qty = parseInt(input.value) || 0;
-            const rowTotal = val * qty;
-            cashTotal += rowTotal;
-            document.getElementById(`t${val}`).textContent = `₹${rowTotal.toLocaleString('en-IN')}`;
+        denomInputs.forEach(i => {
+            const val = Number(i.dataset.val);
+            const qty = Number(i.value) || 0;
+            const total = val * qty;
+            cash += total;
+            document.getElementById(`t${val}`).textContent = `₹${total.toLocaleString('en-IN')}`;
         });
 
-        const digital = parseInt(document.getElementById('digital').value) || 0;
-        const float = parseInt(document.getElementById('startingFloat').value) || 0;
-        
-        const grandTotal = cashTotal + digital;
-        const netHandover = grandTotal - float;
+        const digital = Number(digitalInput().value) || 0;
+        const float = Number(floatInput().value) || 0;
 
-        // Update UI
-        document.getElementById('cashTotal').textContent = `₹${cashTotal.toLocaleString('en-IN')}`;
-        document.getElementById('digitalTotalDisplay').textContent = `₹${digital.toLocaleString('en-IN')}`;
-        document.getElementById('grandTotal').textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
-        document.getElementById('netHandover').textContent = `₹${netHandover.toLocaleString('en-IN')}`;
+        const grand = cash + digital;
+        const net = grand - float;
+
+        setText('cashTotal', cash);
+        setText('digitalTotalDisplay', digital);
+        setText('grandTotal', grand);
+        setText('netHandover', net);
     }
 
-    function shareSlip(type) {
-        const staff = document.getElementById('staffName').value || "N/A";
-        const shift = document.getElementById('shift').value;
-        const float = document.getElementById('startingFloat').value;
-        const cash = document.getElementById('cashTotal').textContent;
-        const digital = document.getElementById('digitalTotalDisplay').textContent;
-        const grand = document.getElementById('grandTotal').textContent;
-        const net = document.getElementById('netHandover').textContent;
-        const notes = document.getElementById('notes').value || "None";
+    function setText(id, val) {
+        document.getElementById(id).textContent = `₹${val.toLocaleString('en-IN')}`;
+    }
 
-        const message = `*TABOCHE RESTAURANT HANDOVER*
-📅 Date: ${new Date().toLocaleDateString()}
-👤 Staff: ${staff}
-🕒 Shift: ${shift}
-------------------------------
-💰 Opening Float: ₹${float}
-💵 Total Cash: ${cash}
-💳 Digital: ${digital}
-------------------------------
-🌟 *GRAND TOTAL: ${grand}*
-✅ *NET SALE: ${net}*
-------------------------------
-📝 Notes: ${notes}
-_Generated via Taboche Handover Pro_`;
+    function share(type) {
+        const msg =
+`*TABOCHE HANDOVER*
+📅 ${formattedDate}
+👤 ${staff().value || 'N/A'}
+🕒 ${shift().value}
+
+💰 Float: ₹${floatInput().value}
+💵 Cash: ${cashTotal().textContent}
+💳 Digital: ${digitalTotal().textContent}
+
+🌟 *Grand:* ${grandTotal().textContent}
+✅ *Net Sale:* ${netTotal().textContent}
+
+📝 ${notes().value || 'None'}
+`;
 
         if (type === 'whatsapp') {
-            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
         } else {
-            navigator.clipboard.writeText(message).then(() => {
-                alert('Slip copied to clipboard! ✅');
-            });
+            navigator.clipboard.writeText(msg).then(() => alert('Copied ✅'));
         }
     }
 
-    function saveFormData() {
+    function saveData() {
         const data = {};
-        inputs.forEach(input => {
-            data[input.id] = input.value;
-        });
-        localStorage.setItem('taboche_handover_data', JSON.stringify(data));
+        inputs.forEach(i => data[i.id] = i.value);
+        localStorage.setItem('taboche_data', JSON.stringify(data));
     }
 
-    function loadFormData() {
-        const saved = localStorage.getItem('taboche_handover_data');
-        if (saved) {
-            const data = JSON.parse(saved);
-            Object.keys(data).forEach(key => {
-                const el = document.getElementById(key);
-                if (el) el.value = data[key];
-            });
-            calculateTotals();
-        }
+    function loadData() {
+        const data = JSON.parse(localStorage.getItem('taboche_data') || '{}');
+        Object.keys(data).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = data[id];
+        });
     }
 
     function resetForm() {
-        if (confirm("Are you sure you want to clear all data?")) {
-            localStorage.removeItem('taboche_handover_data');
-            location.reload();
-        }
+        if (!confirm('Clear all data?')) return;
+        localStorage.removeItem('taboche_data');
+        inputs.forEach(i => i.value = '');
+        calculateTotals();
     }
+
+    /* Shortcuts */
+    const staff = () => document.getElementById('staffName');
+    const shift = () => document.getElementById('shift');
+    const notes = () => document.getElementById('notes');
+    const floatInput = () => document.getElementById('startingFloat');
+    const digitalInput = () => document.getElementById('digital');
+    const cashTotal = () => document.getElementById('cashTotal');
+    const digitalTotal = () => document.getElementById('digitalTotalDisplay');
+    const grandTotal = () => document.getElementById('grandTotal');
+    const netTotal = () => document.getElementById('netHandover');
+
 });
