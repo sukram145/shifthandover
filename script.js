@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // Set Date
     const now = new Date();
     const formattedDate = now.toLocaleString('en-IN', {
         weekday: 'long',
@@ -9,18 +10,23 @@ document.addEventListener('DOMContentLoaded', () => {
         hour: '2-digit',
         minute: '2-digit'
     });
-
     document.getElementById('currentDate').textContent = formattedDate;
 
-    const inputs = document.querySelectorAll('input[id], select[id], textarea[id]');
+    // Selectors
+    const inputs = document.querySelectorAll('input, select, textarea');
     const denomInputs = document.querySelectorAll('.denom-input');
 
+    // Helper functions for values
+    const getVal = (id) => document.getElementById(id);
+
+    // Initial Load
     loadData();
     calculateTotals();
 
+    // Event Listeners
     inputs.forEach(el => {
         el.addEventListener('input', () => {
-            sanitize();
+            if (el.type === 'number' && el.value < 0) el.value = 0;
             calculateTotals();
             saveData();
         });
@@ -30,71 +36,69 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('whatsappBtn').onclick = () => share('whatsapp');
     document.getElementById('resetBtn').onclick = resetForm;
 
-    function sanitize() {
-        document.querySelectorAll('input[type="number"]').forEach(i => {
-            if (i.value < 0) i.value = 0;
-        });
-    }
-
     function calculateTotals() {
         let cash = 0;
 
         denomInputs.forEach(i => {
             const val = Number(i.dataset.val);
             const qty = Number(i.value) || 0;
-            const total = val * qty;
-            cash += total;
-            document.getElementById(`t${val}`).textContent = `₹${total.toLocaleString('en-IN')}`;
+            const rowTotal = val * qty;
+            cash += rowTotal;
+            document.getElementById(`t${val}`).textContent = `₹${rowTotal.toLocaleString('en-IN')}`;
         });
 
-        const digital = Number(digitalInput().value) || 0;
-        const float = Number(floatInput().value) || 0;
+        const digital = Number(getVal('digital').value) || 0;
+        const float = Number(getVal('startingFloat').value) || 0;
 
         const grand = cash + digital;
         const net = grand - float;
 
-        setText('cashTotal', cash);
-        setText('digitalTotalDisplay', digital);
-        setText('grandTotal', grand);
-        setText('netHandover', net);
-    }
-
-    function setText(id, val) {
-        document.getElementById(id).textContent = `₹${val.toLocaleString('en-IN')}`;
+        document.getElementById('cashTotal').textContent = `₹${cash.toLocaleString('en-IN')}`;
+        document.getElementById('digitalTotalDisplay').textContent = `₹${digital.toLocaleString('en-IN')}`;
+        document.getElementById('grandTotal').textContent = `₹${grand.toLocaleString('en-IN')}`;
+        document.getElementById('netHandover').textContent = `₹${net.toLocaleString('en-IN')}`;
     }
 
     function share(type) {
-        const msg =
+        const staff = getVal('staffName').value || 'N/A';
+        const shift = getVal('shift').value;
+        const float = getVal('startingFloat').value;
+        const cash = document.getElementById('cashTotal').textContent;
+        const digital = document.getElementById('digitalTotalDisplay').textContent;
+        const grand = document.getElementById('grandTotal').textContent;
+        const net = document.getElementById('netHandover').textContent;
+        const notes = getVal('notes').value || 'None';
+
+        const msg = 
 `*TABOCHE HANDOVER*
 📅 ${formattedDate}
-👤 ${staff().value || 'N/A'}
-🕒 ${shift().value}
+👤 Staff: ${staff}
+🕒 Shift: ${shift}
 
-💰 Float: ₹${floatInput().value}
-💵 Cash: ${cashTotal().textContent}
-💳 Digital: ${digitalTotal().textContent}
+💰 Float: ₹${float}
+💵 Cash: ${cash}
+💳 Digital: ${digital}
 
-🌟 *Grand:* ${grandTotal().textContent}
-✅ *Net Sale:* ${netTotal().textContent}
+🌟 *Grand Total:* ${grand}
+✅ *NET SALE:* ${net}
 
-📝 ${notes().value || 'None'}
-`;
+📝 Remarks: ${notes}`;
 
         if (type === 'whatsapp') {
             window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
         } else {
-            navigator.clipboard.writeText(msg).then(() => alert('Copied ✅'));
+            navigator.clipboard.writeText(msg).then(() => alert('Copied to Clipboard! ✅'));
         }
     }
 
     function saveData() {
         const data = {};
-        inputs.forEach(i => data[i.id] = i.value);
-        localStorage.setItem('taboche_data', JSON.stringify(data));
+        inputs.forEach(i => { if(i.id) data[i.id] = i.value; });
+        localStorage.setItem('taboche_pro_data', JSON.stringify(data));
     }
 
     function loadData() {
-        const data = JSON.parse(localStorage.getItem('taboche_data') || '{}');
+        const data = JSON.parse(localStorage.getItem('taboche_pro_data') || '{}');
         Object.keys(data).forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = data[id];
@@ -102,21 +106,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetForm() {
-        if (!confirm('Clear all data?')) return;
-        localStorage.removeItem('taboche_data');
-        inputs.forEach(i => i.value = '');
+        if (!confirm('This will clear all current entry data. Continue?')) return;
+        localStorage.removeItem('taboche_pro_data');
+        inputs.forEach(i => {
+            if(i.tagName === 'SELECT') return; // Keep float/shift defaults
+            i.value = i.type === 'number' ? 0 : '';
+        });
         calculateTotals();
     }
-
-    /* Shortcuts */
-    const staff = () => document.getElementById('staffName');
-    const shift = () => document.getElementById('shift');
-    const notes = () => document.getElementById('notes');
-    const floatInput = () => document.getElementById('startingFloat');
-    const digitalInput = () => document.getElementById('digital');
-    const cashTotal = () => document.getElementById('cashTotal');
-    const digitalTotal = () => document.getElementById('digitalTotalDisplay');
-    const grandTotal = () => document.getElementById('grandTotal');
-    const netTotal = () => document.getElementById('netHandover');
-
 });

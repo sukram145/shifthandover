@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taboche Pro Handover</title>
 
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Styles -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,7 +23,6 @@
 
     <main class="grid-layout">
 
-        <!-- Staff -->
         <section class="card">
             <div class="card-header">
                 <i class="fa-solid fa-user-tie"></i> Personnel
@@ -46,7 +43,6 @@
             </div>
         </section>
 
-        <!-- Settings -->
         <section class="card">
             <div class="card-header">
                 <i class="fa-solid fa-cash-register"></i> Register
@@ -67,24 +63,22 @@
             </div>
         </section>
 
-        <!-- Cash -->
         <section class="card span-two">
             <div class="card-header">
                 <i class="fa-solid fa-money-bill-wave"></i> Cash Count
             </div>
 
             <div class="denomination-grid">
-                <div class="denom-row"><span>₹1000</span><input type="number" class="denom-input" data-val="1000" id="d1000" value="0"><span class="row-total" id="t1000">₹0</span></div>
-                <div class="denom-row"><span>₹500</span><input type="number" class="denom-input" data-val="500" id="d500" value="0"><span class="row-total" id="t500">₹0</span></div>
-                <div class="denom-row"><span>₹100</span><input type="number" class="denom-input" data-val="100" id="d100" value="0"><span class="row-total" id="t100">₹0</span></div>
-                <div class="denom-row"><span>₹50</span><input type="number" class="denom-input" data-val="50" id="d50" value="0"><span class="row-total" id="t50">₹0</span></div>
-                <div class="denom-row"><span>₹20</span><input type="number" class="denom-input" data-val="20" id="d20" value="0"><span class="row-total" id="t20">₹0</span></div>
-                <div class="denom-row"><span>₹10</span><input type="number" class="denom-input" data-val="10" id="d10" value="0"><span class="row-total" id="t10">₹0</span></div>
-                <div class="denom-row"><span>₹5</span><input type="number" class="denom-input" data-val="5" id="d5" value="0"><span class="row-total" id="t5">₹0</span></div>
+                <div class="denom-row"><span>₹500</span><input type="number" class="denom-input" data-val="500" id="d500" value="0" inputmode="numeric"><span class="row-total" id="t500">₹0</span></div>
+                <div class="denom-row"><span>₹200</span><input type="number" class="denom-input" data-val="200" id="d200" value="0" inputmode="numeric"><span class="row-total" id="t200">₹0</span></div>
+                <div class="denom-row"><span>₹100</span><input type="number" class="denom-input" data-val="100" id="d100" value="0" inputmode="numeric"><span class="row-total" id="t100">₹0</span></div>
+                <div class="denom-row"><span>₹50</span><input type="number" class="denom-input" data-val="50" id="d50" value="0" inputmode="numeric"><span class="row-total" id="t50">₹0</span></div>
+                <div class="denom-row"><span>₹20</span><input type="number" class="denom-input" data-val="20" id="d20" value="0" inputmode="numeric"><span class="row-total" id="t20">₹0</span></div>
+                <div class="denom-row"><span>₹10</span><input type="number" class="denom-input" data-val="10" id="d10" value="0" inputmode="numeric"><span class="row-total" id="t10">₹0</span></div>
+                <div class="denom-row"><span>₹5</span><input type="number" class="denom-input" data-val="5" id="d5" value="0" inputmode="numeric"><span class="row-total" id="t5">₹0</span></div>
             </div>
         </section>
 
-        <!-- Notes -->
         <section class="card">
             <div class="card-header">
                 <i class="fa-solid fa-pen"></i> Remarks
@@ -92,7 +86,6 @@
             <textarea id="notes" placeholder="Any notes or discrepancies..."></textarea>
         </section>
 
-        <!-- Summary -->
         <section class="card summary-card">
             <div class="card-header">Handover Summary</div>
 

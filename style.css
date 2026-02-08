@@ -128,55 +128,39 @@ textarea {
 
 input:focus,
 select:focus,
-textarea:focus,
-.btn:focus-visible {
+textarea:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
-}
-
-/* Remove number arrows */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-}
-input[type=number] {
-    -moz-appearance: textfield;
 }
 
 /* ---------- DENOMINATIONS ---------- */
 .denomination-grid {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .denom-row {
     display: grid;
-    grid-template-columns: 56px 1fr 90px;
+    grid-template-columns: 60px 1fr 100px;
     gap: 12px;
     align-items: center;
-    padding: 6px;
-    border-radius: 10px;
-    transition: background 0.2s ease;
+    padding: 4px 8px;
+    border-bottom: 1px solid #f1f5f9;
 }
 
-.denom-row:hover {
-    background: rgba(99,102,241,0.05);
+.denom-row span:first-child {
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 0.9rem;
 }
 
 .row-total {
     text-align: right;
     font-weight: 600;
-    color: var(--muted);
-    font-size: 0.85rem;
-    font-variant-numeric: tabular-nums;
-}
-
-/* ---------- TEXTAREA ---------- */
-textarea {
-    height: 90px;
-    resize: none;
+    color: var(--text-main);
+    font-size: 0.9rem;
 }
 
 /* ---------- SUMMARY ---------- */
@@ -192,99 +176,50 @@ textarea {
 .summary-line {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
+    padding: 10px 0;
     border-bottom: 1px solid rgba(255,255,255,0.15);
-    font-size: 0.95rem;
-}
-
-.summary-line span:last-child {
-    font-variant-numeric: tabular-nums;
 }
 
 .highlight {
-    font-size: 1.15rem;
     font-weight: 700;
-    margin-top: 8px;
+    font-size: 1.1rem;
     border-bottom: 2px solid white;
 }
 
 .net {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: 800;
     color: #4ade80;
-    border-bottom: none;
+    border: none;
 }
 
 /* ---------- BUTTONS ---------- */
 .button-group {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 12px;
-    margin-top: 18px;
+    gap: 10px;
+    margin-top: 15px;
 }
 
 .btn {
     padding: 14px;
-    font-size: 1rem;
-    font-weight: 600;
     border-radius: 10px;
     border: none;
     cursor: pointer;
+    font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
 }
 
-.primary {
-    background: #25d366;
-    color: white;
-}
+.primary { background: #25d366; color: white; }
+.secondary { background: rgba(255,255,255,0.2); color: white; }
+.danger { background: #fee2e2; color: #991b1b; }
 
-.primary:hover {
-    background: #128c7e;
-}
-
-.secondary {
-    background: rgba(255,255,255,0.25);
-    color: white;
-}
-
-.danger {
-    background: #fca5a5;
-    color: #991b1b;
-    font-size: 0.85rem;
-}
-
-/* ---------- TABLET & UP ---------- */
 @media (min-width: 768px) {
-    .grid-layout {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .span-two {
-        grid-column: span 2;
-    }
-
-    .button-group {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .danger {
-        grid-column: span 2;
-    }
-}
-
-/* ---------- LARGE SCREENS ---------- */
-@media (min-width: 1024px) {
-    .grid-layout {
-        gap: 22px;
-    }
-}
-
-/* ---------- FALLBACK ---------- */
-@supports not (backdrop-filter: blur(10px)) {
-    .card {
-        background: #ffffff;
-    }
+    .grid-layout { grid-template-columns: 1fr 1fr; }
+    .span-two { grid-column: span 2; }
+    .button-group { grid-template-columns: 1fr 1fr; }
+    .danger { grid-column: span 2; }
 }
