@@ -1,64 +1,112 @@
-function calculateTotals() {
-  const denominations = {
-    d1000: 1000,
-    d500: 500,
-    d100: 100,
-    d50: 50,
-    d20: 20,
-    d10: 10,
-    d5: 5
-  };
+document.addEventListener('DOMContentLoaded', () => {
+    // Set date
+    const dateEl = document.getElementById('currentDate');
+    const now = new Date();
+    dateEl.textContent = now.toLocaleDateString('en-IN', { 
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+    });
 
-  let cashTotal = 0;
-  for (let id in denominations) {
-    const qty = parseInt(document.getElementById(id).value) || 0;
-    cashTotal += qty * denominations[id];
-  }
+    const inputs = document.querySelectorAll('input, select, textarea');
+    const denomInputs = document.querySelectorAll('.denom-input');
 
-  const digital = parseInt(document.getElementById("digital").value) || 0;
-  const startingFloat = parseInt(document.getElementById("startingFloat").value);
-  const grandTotal = cashTotal + digital;
-  const netHandover = grandTotal - startingFloat;
+    // Load saved data
+    loadFormData();
 
-  document.getElementById("cashTotal").textContent = `Cash: ₹${cashTotal}`;
-  document.getElementById("grandTotal").textContent = `Grand: ₹${grandTotal}`;
-  document.getElementById("netHandover").textContent = `Net: ₹${netHandover}`;
-}
+    // Event Listeners
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            calculateTotals();
+            saveFormData();
+        });
+    });
 
-function shareSlip() {
-  const staffName = document.getElementById("staffName").value || "-";
-  const shift = document.getElementById("shift").value;
-  const notes = document.getElementById("notes").value || "-";
-  const startingFloat = document.getElementById("startingFloat").value;
+    document.getElementById('copyBtn').addEventListener('click', () => shareSlip('copy'));
+    document.getElementById('whatsappBtn').addEventListener('click', () => shareSlip('whatsapp'));
+    document.getElementById('resetBtn').addEventListener('click', resetForm);
 
-  const slip = `
-TABOCHE RESTAURANT
-CASH HANDOVER REPORT
-==============================
+    function calculateTotals() {
+        let cashTotal = 0;
 
-Staff: ${staffName}
-Shift: ${shift}
-Float: ₹${startingFloat}
+        // Calculate Denominations
+        denomInputs.forEach(input => {
+            const val = parseInt(input.getAttribute('data-val'));
+            const qty = parseInt(input.value) || 0;
+            const rowTotal = val * qty;
+            cashTotal += rowTotal;
+            document.getElementById(`t${val}`).textContent = `₹${rowTotal.toLocaleString('en-IN')}`;
+        });
 
-Cash: ${document.getElementById("cashTotal").textContent.split(": ")[1]}
-Grand: ${document.getElementById("grandTotal").textContent.split(": ")[1]}
-Net: ${document.getElementById("netHandover").textContent.split(": ")[1]}
+        const digital = parseInt(document.getElementById('digital').value) || 0;
+        const float = parseInt(document.getElementById('startingFloat').value) || 0;
+        
+        const grandTotal = cashTotal + digital;
+        const netHandover = grandTotal - float;
 
-Notes:
-${notes}
+        // Update UI
+        document.getElementById('cashTotal').textContent = `₹${cashTotal.toLocaleString('en-IN')}`;
+        document.getElementById('digitalTotalDisplay').textContent = `₹${digital.toLocaleString('en-IN')}`;
+        document.getElementById('grandTotal').textContent = `₹${grandTotal.toLocaleString('en-IN')}`;
+        document.getElementById('netHandover').textContent = `₹${netHandover.toLocaleString('en-IN')}`;
+    }
 
-==============================
-Generated via Web Handover App
-`;
+    function shareSlip(type) {
+        const staff = document.getElementById('staffName').value || "N/A";
+        const shift = document.getElementById('shift').value;
+        const float = document.getElementById('startingFloat').value;
+        const cash = document.getElementById('cashTotal').textContent;
+        const digital = document.getElementById('digitalTotalDisplay').textContent;
+        const grand = document.getElementById('grandTotal').textContent;
+        const net = document.getElementById('netHandover').textContent;
+        const notes = document.getElementById('notes').value || "None";
 
-  navigator.clipboard.writeText(slip).then(() => {
-    alert("Slip copied to clipboard!");
-  });
-}
+        const message = `*TABOCHE RESTAURANT HANDOVER*
+📅 Date: ${new Date().toLocaleDateString()}
+👤 Staff: ${staff}
+🕒 Shift: ${shift}
+------------------------------
+💰 Opening Float: ₹${float}
+💵 Total Cash: ${cash}
+💳 Digital: ${digital}
+------------------------------
+🌟 *GRAND TOTAL: ${grand}*
+✅ *NET SALE: ${net}*
+------------------------------
+📝 Notes: ${notes}
+_Generated via Taboche Handover Pro_`;
 
-// Attach listeners
-document.querySelectorAll("input, select").forEach(el => {
-  el.addEventListener("input", calculateTotals);
-  el.addEventListener("change", calculateTotals);
+        if (type === 'whatsapp') {
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+        } else {
+            navigator.clipboard.writeText(message).then(() => {
+                alert('Slip copied to clipboard! ✅');
+            });
+        }
+    }
+
+    function saveFormData() {
+        const data = {};
+        inputs.forEach(input => {
+            data[input.id] = input.value;
+        });
+        localStorage.setItem('taboche_handover_data', JSON.stringify(data));
+    }
+
+    function loadFormData() {
+        const saved = localStorage.getItem('taboche_handover_data');
+        if (saved) {
+            const data = JSON.parse(saved);
+            Object.keys(data).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) el.value = data[key];
+            });
+            calculateTotals();
+        }
+    }
+
+    function resetForm() {
+        if (confirm("Are you sure you want to clear all data?")) {
+            localStorage.removeItem('taboche_handover_data');
+            location.reload();
+        }
+    }
 });
-document.getElementById("shareBtn").addEventListener("click", shareSlip);
